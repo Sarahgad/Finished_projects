@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h> 
+#include <signal.h>
+#include "main.h"
+
+void sigint_handler(int signum);
+    char *lineptr = NULL;
+        char **argv;
+int main() {
+	 if (!isatty(STDIN_FILENO))
+{
+        non_interactive();
+}
+else
+{
+    size_t n = 0;
+    ssize_t nreads;
+    int status;
+    pid_t pid;
+
+
+    argv = malloc(sizeof(char*) * MAX_ARGS);
+    if (argv == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+
+   signal(SIGINT, sigint_handler);
+
+    while (1) {
+        write(1, "$ ", 2);
+
+        nreads = getline(&lineptr, &n, stdin);
+        if (nreads == -1) {
+            perror("getline");
+            exit(EXIT_FAILURE);
+        }
+
+        lineptr[_strlen(lineptr) - 1] = '\0';
+        argv[0] = lineptr;
+        argv[1] = NULL;
+
+        if (_strcmp(argv[0], "exit") == 0) {
+		 free(lineptr);
+        lineptr = NULL;
+        argv[0] = NULL;
+            break;
+        }
+
+         pid = fork();
+        if (pid == -1) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+
+        if (pid == 0) {
+            if (execve(argv[0], argv, NULL) == -1) {
+		     free(lineptr);
+        lineptr = NULL;
+        argv[0] = NULL;
+	free(argv);
+                perror("_execve");
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            if (waitpid(pid, &status, 0) == -1) {
+                perror("waitpid");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        free(lineptr);
+        lineptr = NULL;
+        argv[0] = NULL;
+    }
+
+    free(argv);
+}
+    return 0;
+}
+ 
+void sigint_handler(int signum) {
+    if (signum == SIGINT) {
+
+        free(lineptr);
+        lineptr = NULL;
+	free(argv);
+	exit(EXIT_SUCCESS);
+
+    }
+}

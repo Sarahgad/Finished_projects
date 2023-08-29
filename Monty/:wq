@@ -1,0 +1,241 @@
+#include"monty.h"
+int num = 0;
+/**
+ *checkpush - check opcode
+ *@lineptr: string
+ *@data: struct
+ *@head: struct
+ *@linenumber: int
+ *Return: 0 always success
+ */
+int checkpush(char *lineptr, instruction_t *data, stack_t **head, int linenumber)
+{
+	         char *tokens = NULL;
+tokens = strtok(lineptr, " \n");
+if (tokens == NULL)
+{
+	return (0);
+}
+if (strncmp(tokens, "push", strlen("push")) == 0)
+{
+data->opcode = tokens;
+tokens = strtok(NULL," \n");
+if (tokens == NULL || parse_push_argument(tokens) ==INT_MIN)
+{
+fprintf(stderr, "L%d: usage: push integer\n", linenumber);
+return (EXIT_FAILURE);
+}
+num = atoi(tokens);
+data->f = push;
+data->f(head, linenumber);
+}
+else if(strcmp(tokens,"nop") == 0)
+    {
+        data->opcode = "nop";
+        data->f = nop;
+        nop(head, linenumber);
+    }
+return (0);
+}
+/**
+ *checkdisplay - check opcode
+ *@lineptr: string
+ *@data: struct
+ *@head: struct
+ *@linenumber: int
+ *Return: 0 always success
+ */
+int checkdisplay(char *lineptr, instruction_t *data, stack_t **head, int linenumber)
+{
+	         char *tokens = NULL;
+tokens = strtok(lineptr, " \n");
+       while (*tokens == ' ' || *tokens == '\t')
+          {
+                  tokens++;
+          }
+        if (*tokens == '#')
+                return (0);
+tokens = strtok(lineptr, " \n");
+if (strncmp(tokens, "pall", strlen("pall")) == 0)
+{
+	data->opcode = "pall";
+    tokens = strtok(NULL, " \n");
+        if (tokens != NULL)
+        {
+fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+return (EXIT_FAILURE);
+        }
+data->f = pall;
+data->f(head, linenumber);
+}
+else if (strncmp(tokens, "pint", strlen("pint")) == 0)
+{
+if (strlen("pint") != strlen(tokens))
+{
+fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+return (EXIT_FAILURE);
+}
+data->opcode = "pint";
+        tokens = strtok(NULL, " \n");
+	if (tokens != NULL)
+	{
+	fprintf(stderr,"ERROR: Value\n");
+	}
+data->f = pint;
+pint(head, linenumber);
+}
+return (0);
+}
+/**
+ *checkmunp - check opcode
+ *@lineptr: string
+ *@data: struct
+ *@head: struct
+ *@linenumber: int
+ *Return: 0 always success
+ */
+int checkmunp(char *lineptr, instruction_t *data, stack_t **head, int linenumber)
+{
+	         char *tokens = NULL;
+tokens = strtok(lineptr, " \n");
+       while (*tokens == ' ' || *tokens == '\t')
+          {
+                  tokens++;
+          }
+        if (*tokens == '#')
+                return (0);
+if(strncmp(tokens,"swap",strlen("swap")) == 0)
+	{
+	if (strlen("swap") != strlen(tokens))
+	{
+		fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+		return (EXIT_FAILURE);
+	}
+	data->opcode = "swap";
+	tokens = strtok(NULL, " \n");
+	if (tokens != NULL)
+	{
+	fprintf(stderr,"ERROR: Value\n");
+	}
+	data->f = swap;
+	swap(head, linenumber);
+	}
+ else if(strncmp(tokens,"pop",strlen("pop")) == 0)
+    {
+	      if (strlen("pop") != strlen(tokens))
+        {
+                fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+                return (EXIT_FAILURE);
+        }
+        data->opcode = "pop";
+        tokens = strtok(NULL," \n");
+	 if (tokens != NULL)
+        {
+        fprintf(stderr,"ERROR: Value\n");
+        }
+        data->f = pop;
+        pop(head, linenumber);
+    }
+
+return (0);
+}
+/**
+ *checkop - check opcode
+ *@lineptr: string
+ *@data: struct
+ *@head: struct
+ *@linenumber: int
+ *Return: 0 always success
+ */
+int checkop(char *lineptr, instruction_t *data, stack_t **head, int linenumber)
+{
+	         char *tokens = NULL;
+tokens = strtok(lineptr, " \n");
+       while (*tokens == ' ' || *tokens == '\t')
+          {
+                  tokens++;
+          }
+        if (*tokens == '#')
+                return (0);
+	if(strncmp(tokens,"add",strlen("add")) == 0)
+	{
+	if (strlen("add") != strlen(tokens))
+        {
+                fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+                return (EXIT_FAILURE);
+        }
+	data->opcode = "add";
+	tokens = strtok(NULL, " \n");
+        if (tokens != NULL)
+        {
+        fprintf(stderr,"ERROR: Value\n");
+        }
+        data->f = add;
+        add(head, linenumber);
+    }
+	else if(strncmp(tokens,"sub",strlen("sub")) == 0)
+    {
+	     if (strlen("sub") != strlen(tokens))
+        {
+                fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+                return (EXIT_FAILURE);
+        }
+        data->opcode = "sub";
+        tokens = strtok(NULL, " \n");
+        if (tokens != NULL)
+        {
+        fprintf(stderr,"ERROR: Value\n");
+        }
+        data->f = sub;
+        sub(head, linenumber);
+    }
+	return(0);
+}
+/**
+ *checkopp - check opcode
+ *@lineptr: string
+ *@data: struct
+ *@head: struct
+ *@linenumber: int
+ *Return: 0 always success
+ */
+int checkopp(char *lineptr, instruction_t *data, stack_t **head, int linenumber)
+{
+	 char *tokens = NULL;
+tokens = strtok(lineptr, " \n");
+       while (*tokens == ' ' || *tokens == '\t')
+          {
+                  tokens++;
+          }
+        if (*tokens == '#')
+                return (0);
+   	if((strcmp(tokens,"div")) == 0)
+    {
+        data->opcode = "div";
+        tokens = strtok(NULL, " \n");
+        if (tokens != NULL)
+        {
+        fprintf(stderr,"ERROR: Value\n");
+        }
+        data->f = _div;
+        _div(head, linenumber);
+    }
+ else if(strncmp(tokens,"mul",strlen("mul")) == 0)
+    {
+	          if (strlen("mul") != strlen(tokens))
+        {
+                fprintf(stderr, "L%d: unknown instruction %s\n", linenumber, tokens);
+                return (EXIT_FAILURE);
+        }
+        data->opcode = "mul";
+        tokens = strtok(NULL, " \n");
+        if (tokens != NULL)
+        {
+        fprintf(stderr,"ERROR: Value\n");
+        }
+        data->f = mul;
+        mul(head, linenumber);
+    }
+
+	return (0);
+}
